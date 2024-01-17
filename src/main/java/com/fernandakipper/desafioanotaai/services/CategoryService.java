@@ -4,6 +4,7 @@ import com.fernandakipper.desafioanotaai.domain.category.Category;
 import com.fernandakipper.desafioanotaai.domain.category.CategoryDTO;
 import com.fernandakipper.desafioanotaai.domain.category.exceptions.CategoryNotFoundException;
 import com.fernandakipper.desafioanotaai.repositories.CategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Optional;
 
 @Service
 public class CategoryService {
+
     private CategoryRepository repository;
 
     public CategoryService(CategoryRepository repository){
