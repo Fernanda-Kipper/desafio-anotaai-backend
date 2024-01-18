@@ -2,6 +2,8 @@ package com.fernandakipper.desafioanotaai.services.aws;
 
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.model.Topic;
+import org.apache.tomcat.util.json.JSONParser;
+import org.bson.json.JsonObject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ public class AwsSnsService {
     }
 
     public void publish(MessageDTO message){
-        this.snsClient.publish(catalogTopic.getTopicArn(), message.toString());
+        System.out.println(message.message());
+        this.snsClient.publish(catalogTopic.getTopicArn(), message.message());
     }
 }

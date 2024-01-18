@@ -25,14 +25,13 @@ public class ProductService {
     }
 
     public Product insert(ProductDTO productData){
-        Category category = this.categoryService.getById(productData.categoryId())
+        this.categoryService.getById(productData.categoryId())
                 .orElseThrow(CategoryNotFoundException::new);
         Product newProduct = new Product(productData);
-        newProduct.setCategory(category);
 
         this.repository.save(newProduct);
 
-        this.snsService.publish(new MessageDTO(newProduct.getOwnerId()));
+        this.snsService.publish(new MessageDTO(newProduct.toString()));
 
         return newProduct;
     }
@@ -41,18 +40,17 @@ public class ProductService {
         Product product = this.repository.findById(id)
                 .orElseThrow(ProductNotFoundException::new);
 
-        if(productData.categoryId() != null) {
-            this.categoryService.getById(productData.categoryId())
-                    .ifPresent(product::setCategory);
-        }
+        this.categoryService.getById(productData.categoryId())
+                .orElseThrow(CategoryNotFoundException::new);
 
         if(!productData.title().isEmpty()) product.setTitle(productData.title());
         if(!productData.description().isEmpty()) product.setDescription(productData.description());
         if(!(productData.price() == null)) product.setPrice(productData.price());
+        if(!(productData.categoryId() == null)) product.setCategory(productData.categoryId());
 
         this.repository.save(product);
 
-        this.snsService.publish(new MessageDTO(product.getOwnerId()));
+        this.snsService.publish(new MessageDTO(product.toString()));
 
         return product;
     }
