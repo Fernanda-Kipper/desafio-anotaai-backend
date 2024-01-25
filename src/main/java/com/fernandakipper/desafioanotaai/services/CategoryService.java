@@ -4,6 +4,8 @@ import com.fernandakipper.desafioanotaai.domain.category.Category;
 import com.fernandakipper.desafioanotaai.domain.category.CategoryDTO;
 import com.fernandakipper.desafioanotaai.domain.category.exceptions.CategoryNotFoundException;
 import com.fernandakipper.desafioanotaai.repositories.CategoryRepository;
+import com.fernandakipper.desafioanotaai.services.aws.AwsSnsService;
+import com.fernandakipper.desafioanotaai.services.aws.MessageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +16,20 @@ import java.util.Optional;
 public class CategoryService {
 
     private CategoryRepository repository;
+    private final AwsSnsService snsService;
 
-    public CategoryService(CategoryRepository repository){
+    public CategoryService(CategoryRepository repository, AwsSnsService snsService){
         this.repository = repository;
+        this.snsService = snsService;
     }
 
     public Category insert(CategoryDTO categoryData){
         Category newCategory = new Category(categoryData);
+
         this.repository.save(newCategory);
+
+        this.snsService.publish(new MessageDTO(newCategory.toString()));
+
         return newCategory;
     }
 
@@ -31,6 +39,8 @@ public class CategoryService {
 
         if(!categoryData.title().isEmpty()) category.setTitle(categoryData.title());
         if(!categoryData.description().isEmpty()) category.setDescription(categoryData.description());
+
+        this.snsService.publish(new MessageDTO(category.toString()));
 
         this.repository.save(category);
 
