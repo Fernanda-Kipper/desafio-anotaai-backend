@@ -43,6 +43,18 @@ aws.secretKey=${AWS_SECRET}
 ```yaml
 AWS_KEY_ID=VALUE;AWS_SECRET=VALUE2
 ```
+
+**Mongo**
+
+1. Run in terminal:
+```bash
+docker compose up -d
+```
+
+2. Create a DB for mongo using mongo express: http://localhost:8081.
+
+3. Log with admin:pass and create a database called 'product-catalog'.
+
 ## Usage
 
 1. Start the application with Maven

@@ -10,7 +10,9 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 public class MongoDBConfig {
     @Bean
     public MongoDatabaseFactory mongoConfigure(){
-        return new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/product-catalog");
+        return new SimpleMongoClientDatabaseFactory(
+            "mongodb://root:1234567890@127.0.0.1:27017/product-catalog?authSource=admin"
+        );
     }
 
     @Bean
