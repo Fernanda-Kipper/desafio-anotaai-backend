@@ -52,6 +52,7 @@ public class CategoryService {
                 .orElseThrow(CategoryNotFoundException::new);
 
         this.repository.delete(category);
+        this.snsService.publish(new MessageDTO(category.deleteToString()));
     }
 
     public List<Category> getAll(){
