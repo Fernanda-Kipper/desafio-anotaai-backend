@@ -1,6 +1,5 @@
 package com.fernandakipper.desafioanotaai.services;
 
-import com.fernandakipper.desafioanotaai.domain.category.Category;
 import com.fernandakipper.desafioanotaai.domain.category.exceptions.CategoryNotFoundException;
 import com.fernandakipper.desafioanotaai.domain.product.Product;
 import com.fernandakipper.desafioanotaai.domain.product.ProductDTO;
@@ -8,21 +7,17 @@ import com.fernandakipper.desafioanotaai.domain.product.exceptions.ProductNotFou
 import com.fernandakipper.desafioanotaai.repositories.ProductRepository;
 import com.fernandakipper.desafioanotaai.services.aws.AwsSnsService;
 import com.fernandakipper.desafioanotaai.services.aws.MessageDTO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
     private final CategoryService categoryService;
     private final ProductRepository repository;
     private final AwsSnsService snsService;
-
-    public ProductService(CategoryService categoryService, ProductRepository productRepository, AwsSnsService snsService){
-        this.categoryService = categoryService;
-        this.repository = productRepository;
-        this.snsService = snsService;
-    }
 
     public Product insert(ProductDTO productData){
         this.categoryService.getById(productData.categoryId())

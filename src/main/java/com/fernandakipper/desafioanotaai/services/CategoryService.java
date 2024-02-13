@@ -6,22 +6,18 @@ import com.fernandakipper.desafioanotaai.domain.category.exceptions.CategoryNotF
 import com.fernandakipper.desafioanotaai.repositories.CategoryRepository;
 import com.fernandakipper.desafioanotaai.services.aws.AwsSnsService;
 import com.fernandakipper.desafioanotaai.services.aws.MessageDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
 
-    private CategoryRepository repository;
+    private final CategoryRepository repository;
     private final AwsSnsService snsService;
-
-    public CategoryService(CategoryRepository repository, AwsSnsService snsService){
-        this.repository = repository;
-        this.snsService = snsService;
-    }
 
     public Category insert(CategoryDTO categoryData){
         Category newCategory = new Category(categoryData);
