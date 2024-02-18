@@ -1,65 +1,78 @@
 package com.fernandakipper.desafioanotaai.services;
 
 import com.fernandakipper.desafioanotaai.domain.category.Category;
+import com.fernandakipper.desafioanotaai.domain.category.CategoryDTO;
 import com.fernandakipper.desafioanotaai.domain.category.exceptions.CategoryNotFoundException;
 import com.fernandakipper.desafioanotaai.repositories.CategoryRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.fernandakipper.desafioanotaai.services.aws.AwsSnsService;
+import com.fernandakipper.desafioanotaai.services.aws.MessageDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import static com.fernandakipper.desafioanotaai.utils.MockCategories.*;
+import static com.fernandakipper.desafioanotaai.utils.MockCategories.CATEGORY_ID;
+import static com.fernandakipper.desafioanotaai.utils.MockCategories.DESCRIPTION;
+import static com.fernandakipper.desafioanotaai.utils.MockCategories.OWNER_ID;
+import static com.fernandakipper.desafioanotaai.utils.MockCategories.TITLE;
 import static com.fernandakipper.desafioanotaai.utils.MockCategories.mockCategoryEntity;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static com.fernandakipper.desafioanotaai.utils.MockCategories.mockCategoryList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
+@ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
 
     @Mock
-    CategoryRepository repository;
+    private CategoryRepository repository;
+    @Mock
+    private AwsSnsService snsService;
 
-    @Autowired
     @InjectMocks
-    CategoryService service;
+    private CategoryService service;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+
+    @Test
+    void insertValidData() {
+        final var input = new CategoryDTO("title", "description", "ownerId");
+        final var category = new Category(input);
+        given(repository.save(category)).willReturn(category);
+
+        final var actual = service.insert(input);
+
+        assertEquals(category, actual);
+        then(snsService).should().publish(new MessageDTO(category.toString()));
     }
 
     @Test
-    void insert() {
-    }
-
-    @Test
-    void update() {
+    void updateNonexistentCategory() {
+       assertThrows(CategoryNotFoundException.class,
+           () -> service.update("id", null));
     }
 
     @Test
     @DisplayName("should delete Category when exists")
     void deleteSuccess() {
-        Category category = mockCategoryEntity();
-        when(repository.findById(CATEGORY_ID)).thenReturn(Optional.of(category));
+        final var category = mockCategoryEntity();
+        given(repository.findById(CATEGORY_ID)).willReturn(Optional.of(category));
 
         this.service.delete(CATEGORY_ID);
 
-        Mockito.verify(repository, times(1)).delete(category);
+        then(repository).should().delete(category);
     }
 
     @Test
     @DisplayName("should throw exception when Category not exists")
     void deleteError() {
-        when(repository.findById(CATEGORY_ID)).thenReturn(Optional.empty());
+        given(repository.findById(CATEGORY_ID)).willReturn(Optional.empty());
 
         assertThrows(CategoryNotFoundException.class, () -> {
             this.service.delete(CATEGORY_ID);
@@ -69,9 +82,9 @@ class CategoryServiceTest {
     @Test
     @DisplayName("should return a Category List on getAll")
     void getAllSuccess() {
-        when(repository.findAll()).thenReturn(mockCategoryList());
+        given(repository.findAll()).willReturn(mockCategoryList());
 
-        List<Category> result = this.service.getAll();
+        final var result = this.service.getAll();
 
         assertNotNull(result);
         assertEquals(result.get(0).getOwnerId(), OWNER_ID);
