@@ -41,4 +41,13 @@ public class Product {
 
         return json.toString();
     }
+
+    public String deleteToString(){
+        JSONObject json = new JSONObject();
+        json.put("id", this.id);
+        json.put("ownerId", this.ownerId);
+        json.put("type", "delete-produto");
+
+        return json.toString();
+    }
 }

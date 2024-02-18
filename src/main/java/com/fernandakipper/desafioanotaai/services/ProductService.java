@@ -60,6 +60,7 @@ public class ProductService {
                 .orElseThrow(ProductNotFoundException::new);
 
         this.repository.delete(product);
+        this.snsService.publish(new MessageDTO(product.deleteToString()));
     }
 
     public List<Product> getAll(){
